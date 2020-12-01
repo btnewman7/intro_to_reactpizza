@@ -43,8 +43,8 @@ export default class Home extends Component {
                         </tr>
                         </thead>
                         <tbody>
-                            {this.state.racers.map((racer, index) => (
-                                <tr key={index}>
+                            {this.state.racers.map(racer => (
+                                <tr key={racer.position}>
                                     <td>{racer.position}</td>
                                     <td>{racer.points}</td>
                                     <td>{racer.wins}</td>
