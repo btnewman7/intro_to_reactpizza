@@ -2,33 +2,20 @@ import React, { Component } from 'react'
 
 export default class Home extends Component {
     // since we need to gain access to the state of our component, we need to go through the contructor
-    constructor() {
-        console.log("component constructed");
-        super();
-
-        this.state = {
-            racers: []
-        }
-    }
-
-    componentDidMount() {
-        console.log("component mounted");
-        fetch('https://ergast.com/api/f1/2018/5/driverStandings.json')
-            .then(res => res.json())
-            .then(data => {
-                this.setState({
-                    racers: data.MRData.StandingsTable.StandingsLists[0].DriverStandings
-                })
-            })
-            .catch(error => console.error(error))
-    }
 
     render() {
 
-        console.log("component rendered");
-        console.log(this.state.racers);
-
         return (
+            <React.Fragment>
+            <h3>{this.props.name}</h3>
+            <hr />
+            
+            <form className="form-inline" onSubmit={(e) => this.props.handleSubmit(e)}>
+                <input type="text" className="form-control mb-2 mr-sm-2" name='year' placeholder="Year" />
+                <input type="text" className="form-control mb-2 mr-sm-2" name='season'placeholder="Season" />
+                <button type="submit" className="btn btn-outline-info mb-2">Submit</button>
+            </form>
+
             <div className="table-responsive">
                 <table className="table table-striped table-inverse">
                     <thead className="thead-inverse">
@@ -43,7 +30,7 @@ export default class Home extends Component {
                         </tr>
                         </thead>
                         <tbody>
-                            {this.state.racers.map(racer => (
+                            {this.props.racers.map(racer => (
                                 <tr key={racer.position}>
                                     <td>{racer.position}</td>
                                     <td>{racer.points}</td>
@@ -61,6 +48,7 @@ export default class Home extends Component {
                         </tbody>
                 </table>
             </div>
+            </React.Fragment>
         )
     }
 }

@@ -1,21 +1,89 @@
 import React, { Component } from 'react';
 import Navbar from './components/Navbar/';
 import { Switch, Route } from 'react-router-dom';
-import Home from './components/views/Home';
-import About from './components/views/About';
-import Contact from './components/views/Contact';
+import Home from './views/Home';
+import About from './views/About';
+import Contact from './views/Contact';
+import Shop from './views/Shop';
+import Cart from './views/Cart';
+import Blog from './views/Blog';
+import BlogSingle from './views/BlogSingle';
 
 export default class App extends Component {
+  constructor() {
+    super();
+
+    this.state = { 
+        name: "Ben Newman",
+        racers: [],
+        stuff: '',
+        cart: [],
+    }
+  }
+        
+  addToCart = (product) => {
+    this.setState({
+      cart: this.state.cart.concat(product)
+    })
+  }
+
+  removeFromCart = product => {
+    let newCart = [...this.state.cart];
+    // let index = newCart.indexOf(product);
+
+    for (let i = 0; i < newCart.length; i++) {
+      const item = newCart[i];
+      if (product === item) {
+        newCart.splice(i, 1)
+        break;
+      }
+    }
+
+    this.setState({
+      cart: newCart
+    })
+
+    // if (index !== 1) {
+    //   newCart.splice(index, 1)
+    //   this.setState({
+    //     cart: newCart
+    //   })
+    // }
+  }
+
+
+  handleSubmit = (e) => {
+    e.preventDefault();
+    var year = (e.target.year.value)
+    var season =(e.target.season.value)
+
+    fetch(`https://ergast.com/api/f1/${year}/${season}/driverStandings.json`)
+        .then(res => res.json())
+        .then(data => {
+
+            this.setState({
+                racers: data.MRData.StandingsTable.StandingsLists[0].DriverStandings
+            })
+        })
+        .catch(error => console.error(error))
+
+        e.target.reset()
+  }
+
   render() {
     return (
       <div>
-        <Navbar />
+        <Navbar cart={this.state.cart}/>
 
         <main className="container">
           <Switch>
-            <Route exact path='/' render={() => <Home />} />
-            <Route path='/about' render={() => <About />} />
-            <Route path='/contact' render={() => < Contact/>} />
+            <Route exact path='/' render={() => <Home handleSubmit={this.handleSubmit} name={this.state.name} racers={this.state.racers}/>} />
+            <Route exact path='/about' render={() => <About name={this.state.name} stuff={this.getStuff}/>} />
+            <Route exact path='/contact' render={() => <Contact name={this.state.name} stuff={this.state.stuff}/>} />
+            <Route exact path='/shop' render={() => <Shop addToCart={this.addToCart}/>} />
+            <Route exact path='/cart' render={() => <Cart cart={this.state.cart} removeFromCart={this.removeFromCart} />} />
+            <Route exact path='/blog' render={() => <Blog />} />
+            <Route exact path="/blog/:id" render={({ match })=> <BlogSingle match={match}/>} />
           </Switch>
         </main>
 
